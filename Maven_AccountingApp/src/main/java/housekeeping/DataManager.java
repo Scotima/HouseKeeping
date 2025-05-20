@@ -1,3 +1,4 @@
+package housekeeping;
 import java.util.List;
 
 public interface DataManager {

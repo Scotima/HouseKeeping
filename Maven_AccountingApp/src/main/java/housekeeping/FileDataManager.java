@@ -1,3 +1,4 @@
+package housekeeping;
 import java.io.*;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -35,14 +36,14 @@ public class FileDataManager implements DataManager {
             while ((line = br.readLine()) != null) {
                 String[] parts = line.split(",", -1);
                 if (parts.length >= 5) {
-                    Transaction t = new Transaction(
-                            parts[0],
-                            parts[1],
-                            Double.parseDouble(parts[2]),
-                            parts[3],
-                            DATE_FORMAT.parse(parts[4])
-                    );
-                    list.add(t);
+                   // Transaction t = new Transaction(
+                        //    parts[0],
+                        //    parts[1],
+                        //    Double.parseDouble(parts[2]),
+                      //      parts[3],
+                        //    DATE_FORMAT.parse(parts[4])
+                  //  );
+                   // list.add(t);
                 }
             }
         } catch (Exception e) {

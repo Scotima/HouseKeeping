@@ -1,3 +1,4 @@
+package housekeeping;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -11,7 +12,7 @@ public class DBDataManager implements DataManager {
     public void save(Transaction t, int userId) {
         try (Connection conn = DatabaseConnection.connect();
              PreparedStatement ps = conn.prepareStatement(
-                     "INSERT INTO expenses (user_id, category, amount, description, date) VALUES (?, ?, ?, ?, ?)")) {
+                     "INSERT INTO expenses (user_id, category_id, amount, description, date) VALUES (?, ?, ?, ?, ?)")) {
 
             ps.setInt(1, userId);
             ps.setString(2, t.getType());
