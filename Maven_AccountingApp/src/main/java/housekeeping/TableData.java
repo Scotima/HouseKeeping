@@ -105,4 +105,11 @@ public class TableData extends AbstractTableModel {
             default: return null;
         }
     }
+    
+    public Transaction getTransactionAt(int rowIndex) {
+        if (list != null && rowIndex >= 0 && rowIndex < list.size()) {
+            return list.get(rowIndex);
+        }
+        return null;
+    }
 }  

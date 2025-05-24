@@ -23,7 +23,7 @@ import java.awt.event.ActionListener;
 public class App {
     private JFrame frame;
     private JPanel currPanel;
-    private int loggedInUserId;
+    private static int loggedInUserId;
 
     private List<String> categoryList = new ArrayList<>();
     private Map<String, Integer> categoryMap = new HashMap<>();
@@ -84,9 +84,15 @@ public class App {
         	tranPanel = new TransactionPanel(
         	    new ImageIcon(getClass().getResource("/Activation.jpg")).getImage(),
         	    categoryList.toArray(new String[0]),
-        	    e -> submitTransaction(tranPanel),
+        	    e -> {submitTransaction(tranPanel);
+        	    	  td.updateList(loggedInUserId);
+        	    	  sumPanel.refreshTable();
+        	    	  switchPanel(sumPanel);},
         	    e -> switchPanel(sumPanel)
         	);
+        	tranPanel.noteInput.setFont(new Font("한컴 고딕", Font.PLAIN, 33));
+        	tranPanel.amountInput.setFont(new Font("맑은 고딕", Font.PLAIN, 33));
+        	tranPanel.nameInput.setFont(new Font("맑은 고딕", Font.PLAIN, 33));
         	tranPanel.submitButton.addActionListener(new ActionListener() {
         		public void actionPerformed(ActionEvent e) {
         		}
@@ -105,8 +111,9 @@ public class App {
         currPanel = loginPanel;
         frame.setSize(loginPanel.getDim());
         frame.setPreferredSize(loginPanel.getDim());
-        frame.getContentPane().add(sumPanel);
+        
         frame.getContentPane().add(tranPanel);
+        frame.getContentPane().add(sumPanel);
         frame.getContentPane().add(loginPanel);
 
         loginPanel.setVisible(true);
@@ -256,5 +263,9 @@ public class App {
         });
 
         signupFrame.setVisible(true);
+    }
+    
+    public static int getLoggedInUserId() {
+        return loggedInUserId;
     }
 }    

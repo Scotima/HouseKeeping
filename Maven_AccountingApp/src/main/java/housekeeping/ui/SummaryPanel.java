@@ -1,8 +1,9 @@
 package housekeeping.ui;
 
 import housekeeping.ImagePanel;
+import housekeeping.App;
 import housekeeping.DatabaseConnection;
-
+import housekeeping.chart.ChartViewer;
 import javax.swing.*;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.JTableHeader;
@@ -16,6 +17,14 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import housekeeping.PDFReportGenerator;
+import housekeeping.Transaction;
+import housekeeping.chart.ChartViewer;
+import housekeeping.TableData;
+import java.util.List;
+import java.util.ArrayList;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 public class SummaryPanel extends ImagePanel {
     private static final long serialVersionUID = 1L;
@@ -92,6 +101,84 @@ public class SummaryPanel extends ImagePanel {
         });
 
         categoryFilter.addActionListener(e -> applyFilters());
+        
+        
+        
+        //pdf 생성 코드
+        JButton reportBtn = new JButton("보고서 만들기");
+        reportBtn.setBounds(1300, 620, 200, 40); // 원하는 위치로 조정
+        reportBtn.setFont(new Font("맑은 고딕", Font.PLAIN, 20));
+        reportBtn.setEnabled(false); // 처음엔 비활성화
+        add(reportBtn);
+
+        // 테이블 클릭 시 버튼 활성화
+        table.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                int row = table.rowAtPoint(e.getPoint());
+                if (row >= 0) {
+                    reportBtn.setEnabled(true);
+                }
+            }
+        });
+
+        // 버튼 클릭 시 PDF 생성
+        reportBtn.addActionListener(e -> {
+            int[] selectedRows = table.getSelectedRows();
+            if (selectedRows.length == 0) {
+                JOptionPane.showMessageDialog(this, "거래를 한 개 이상 선택하세요.");
+                return;
+            }
+            List<Transaction> selectedTransactions = new ArrayList<>();
+            TableData td = (TableData) table.getModel();
+         
+            
+            for(int row : selectedRows) {
+            	int modelRow = table.convertColumnIndexToModel(row);
+            	selectedTransactions.add(td.getTransactionAt(modelRow));
+            }
+
+            String[] options = {"회사 보고서", "대학교 보고서", "개인 기록용"};
+            String format = (String) JOptionPane.showInputDialog(
+                this,
+                "보고서 형식을 선택하세요",
+                "보고서 양식 선택",
+                JOptionPane.PLAIN_MESSAGE,
+                null,
+                options,
+                options[0]
+            );
+
+            if (format != null) {
+                JFileChooser fileChooser = new JFileChooser();
+                fileChooser.setDialogTitle("PDF 보고서 저장 위치 선택");
+                int result = fileChooser.showSaveDialog(this);
+                if (result == JFileChooser.APPROVE_OPTION) {
+                    String path = fileChooser.getSelectedFile().getAbsolutePath();
+                    if (!path.endsWith(".pdf")) path += ".pdf";
+                    try {
+                        PDFReportGenerator.saveToPDF(selectedTransactions, path);
+                        JOptionPane.showMessageDialog(this, "PDF 보고서가 저장되었습니다.");
+                    } catch (Exception ex) {
+                        ex.printStackTrace();
+                        JOptionPane.showMessageDialog(this, "보고서 생성 중 오류: " + ex.getMessage());
+                    }
+                }
+            }
+        });
+        
+        table.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+
+        
+        //지출 그래프 버튼
+        JButton chartBtn = new JButton("지출 그래프 보기");
+        chartBtn.setBounds(29, 300, 259, 40);
+        chartBtn.setFont(new Font("맑은 고딕", Font.PLAIN, 20));
+        add(chartBtn);
+        
+        chartBtn.addActionListener(e -> {
+            new ChartViewer(App.getLoggedInUserId()); // 또는 현재 userId
+        });
     }
 
     private void applyFilters() {
@@ -113,4 +200,11 @@ public class SummaryPanel extends ImagePanel {
             sorter.setRowFilter(RowFilter.andFilter(java.util.Arrays.asList(rf1, rf2)));
         }
     }
+    
+    public void refreshTable() {
+        ((AbstractTableModel) table.getModel()).fireTableDataChanged();
+        table.repaint();
+    }
+    
+   
 }

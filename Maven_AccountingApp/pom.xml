@@ -12,7 +12,11 @@
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+     <maven.compiler.source>15</maven.compiler.source>
+    <maven.compiler.target>15</maven.compiler.target>
   </properties>
+  
+  
 
   <dependencies>
     <dependency>
@@ -26,5 +30,17 @@
       <artifactId>mysql-connector-java</artifactId>
       <version>8.0.26</version> <!-- 최신 버전을 사용할 수 있습니다 -->
     </dependency>
+    
+    <dependency>
+   	 <groupId>com.itextpdf</groupId>
+     <artifactId>itextpdf</artifactId>
+     <version>5.5.13.3</version>
+    </dependency>
+    
+    <dependency>
+    <groupId>org.jfree</groupId>
+    <artifactId>jfreechart</artifactId>
+    <version>1.5.4</version>
+</dependency>
   </dependencies>
 </project>
