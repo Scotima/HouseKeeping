@@ -27,7 +27,7 @@ public class TransactionPanel extends ImagePanel {
 	        
 	        
 	        sumBtn = new JButton("");
-	        sumBtn.setIcon(new ImageIcon(getClass().getResource("/Summary.jpg")));
+	        sumBtn.setIcon(new ImageIcon(getClass().getResource("/checkexpense.jpg")));
 	        sumBtn.setBorder(null);
 	        sumBtn.setBounds(29, 123, 259, 40);
 	        sumBtn.addActionListener(onBackToSummary);

@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.ArrayList;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.File;
 
 public class SummaryPanel extends ImagePanel {
     private static final long serialVersionUID = 1L;
@@ -43,13 +44,13 @@ public class SummaryPanel extends ImagePanel {
         tranBtn = new JButton("");
         tranBtn.setBounds(29, 182, 259, 40);
         tranBtn.setBorder(null);
-        tranBtn.setIcon(new ImageIcon(getClass().getResource("/Transaction.jpg")));
+        tranBtn.setIcon(new ImageIcon(getClass().getResource("/record.jpg")));
         tranBtn.addActionListener(onTranBtnClick);
         add(tranBtn);
 
         JLabel lblSearch = new JLabel("Search :");
         lblSearch.setFont(new Font("Tahoma", Font.PLAIN, 22));
-        lblSearch.setBounds(337, 76, 83, 40);
+        lblSearch.setBounds(345, 76, 83, 40);
         add(lblSearch);
 
         searchInput = new JTextField();
@@ -106,6 +107,7 @@ public class SummaryPanel extends ImagePanel {
         
         //pdf 생성 코드
         JButton reportBtn = new JButton("보고서 만들기");
+        reportBtn.setBackground(new Color(234, 226, 219));
         reportBtn.setBounds(1300, 620, 200, 40); // 원하는 위치로 조정
         reportBtn.setFont(new Font("맑은 고딕", Font.PLAIN, 20));
         reportBtn.setEnabled(false); // 처음엔 비활성화
@@ -156,8 +158,26 @@ public class SummaryPanel extends ImagePanel {
                 if (result == JFileChooser.APPROVE_OPTION) {
                     String path = fileChooser.getSelectedFile().getAbsolutePath();
                     if (!path.endsWith(".pdf")) path += ".pdf";
+                    
+                    //영수증 이미지 첨부 선택
+                    
+                    List<String> imagePaths = new ArrayList<>();
+                    int attachTmg = JOptionPane.showConfirmDialog(this, "영수증을 첨부하시겠습니까?", "영수증 올리기", JOptionPane.YES_NO_OPTION);
+                    if(attachTmg == JOptionPane.YES_OPTION) {
+                    	JFileChooser imageChooser = new JFileChooser();
+                    	imageChooser.setMultiSelectionEnabled(true);
+                    	imageChooser.setDialogTitle("첨부할 이미지 선택 (여러개 가능)");
+                    	int imageResult = imageChooser.showOpenDialog(this);
+                    	if(imageResult == JFileChooser.APPROVE_OPTION) {
+                    		for(File img : imageChooser.getSelectedFiles()) {
+                    			imagePaths.add(img.getAbsolutePath());
+                    		}
+                    	}
+                    	
+                    }
+                    
                     try {
-                        PDFReportGenerator.saveToPDF(selectedTransactions, path);
+                        PDFReportGenerator.saveToPDF(selectedTransactions, path, imagePaths);
                         JOptionPane.showMessageDialog(this, "PDF 보고서가 저장되었습니다.");
                     } catch (Exception ex) {
                         ex.printStackTrace();
@@ -171,9 +191,10 @@ public class SummaryPanel extends ImagePanel {
 
         
         //지출 그래프 버튼
-        JButton chartBtn = new JButton("지출 그래프 보기");
-        chartBtn.setBounds(29, 300, 259, 40);
+        JButton chartBtn = new JButton("");
+        chartBtn.setBounds(370, 620, 259, 40);
         chartBtn.setFont(new Font("맑은 고딕", Font.PLAIN, 20));
+        chartBtn.setIcon(new ImageIcon(getClass().getResource("/viewgraph.jpg")));
         add(chartBtn);
         
         chartBtn.addActionListener(e -> {

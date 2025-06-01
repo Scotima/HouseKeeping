@@ -75,14 +75,18 @@ public class App {
 
         // 패널들 초기화
         loginPanel = new LoginPanel(
-        	    new ImageIcon(getClass().getResource("/theme.jpg")).getImage(),
+        	    new ImageIcon(getClass().getResource("/loginpanel.jpg")).getImage(),
         	    e -> handleLogin(loginPanel, sumPanel),
         	    e -> showSignupPanel()
         	);
-        loginPanel.logInBtn.setText("로그인");
+        loginPanel.signupBtn.addActionListener(new ActionListener() {
+        	public void actionPerformed(ActionEvent e) {
+        	}
+        });
+     
 
         	tranPanel = new TransactionPanel(
-        	    new ImageIcon(getClass().getResource("/Activation.jpg")).getImage(),
+        	    new ImageIcon(getClass().getResource("/Panelback.jpg")).getImage(),
         	    categoryList.toArray(new String[0]),
         	    e -> {submitTransaction(tranPanel);
         	    	  td.updateList(loggedInUserId);
@@ -90,6 +94,8 @@ public class App {
         	    	  switchPanel(sumPanel);},
         	    e -> switchPanel(sumPanel)
         	);
+        	tranPanel.submitButton.setBackground(new Color(240, 240, 240));
+        	tranPanel.sumBtn.setLocation(41, 123);
         	tranPanel.noteInput.setFont(new Font("한컴 고딕", Font.PLAIN, 33));
         	tranPanel.amountInput.setFont(new Font("맑은 고딕", Font.PLAIN, 33));
         	tranPanel.nameInput.setFont(new Font("맑은 고딕", Font.PLAIN, 33));
@@ -100,10 +106,12 @@ public class App {
         	tranPanel.typeInput.setFont(new Font("맑은 고딕", Font.PLAIN, 33));
 
         	sumPanel = new SummaryPanel(
-        	    new ImageIcon(getClass().getResource("/Activation.jpg")).getImage(),
+        	    new ImageIcon(getClass().getResource("/Panelback.jpg")).getImage(),
         	    td,
         	    e -> switchPanel(tranPanel)
         	);
+        	sumPanel.tranBtn.setLocation(38, 219);
+        	sumPanel.searchInput.setLocation(438, 77);
         	sumPanel.table.setFont(new Font("맑은 고딕", Font.BOLD, 15));
         	sumPanel.categoryFilter.setFont(new Font("맑은 고딕", Font.PLAIN, 22));
 
@@ -112,8 +120,8 @@ public class App {
         frame.setSize(loginPanel.getDim());
         frame.setPreferredSize(loginPanel.getDim());
         
-        frame.getContentPane().add(tranPanel);
         frame.getContentPane().add(sumPanel);
+        frame.getContentPane().add(tranPanel);
         frame.getContentPane().add(loginPanel);
 
         loginPanel.setVisible(true);

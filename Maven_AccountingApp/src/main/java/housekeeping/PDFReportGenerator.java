@@ -5,15 +5,16 @@ import com.itextpdf.text.pdf.*;
 
 import java.io.FileOutputStream;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.List;
 
 public class PDFReportGenerator {
 
     public static void saveToPDF(Transaction t, String path, String formatType) throws Exception {
-        saveToPDF(java.util.Collections.singletonList(t), path);
+        saveToPDF(java.util.Collections.singletonList(t), path, new ArrayList<>());
     }
 
-    public static void saveToPDF(List<Transaction> transactions, String path) throws Exception {
+    public static void saveToPDF(List<Transaction> transactions, String path, List<String> imagePaths) throws Exception {
         Document document = new Document(PageSize.A4);
         PdfWriter.getInstance(document, new FileOutputStream(path));
         document.open();
@@ -114,7 +115,7 @@ public class PDFReportGenerator {
         Paragraph foot = new Paragraph("위 금액을 지출 결의합니다.", contentFont);
         foot.setSpacingBefore(20);
         document.add(foot);
-
+        
         Paragraph date = new Paragraph(sdf.format(representative.getDate()), contentFont);
         date.setSpacingBefore(10);
         document.add(date);
@@ -122,6 +123,26 @@ public class PDFReportGenerator {
         Paragraph sign = new Paragraph("영수자: (인)", contentFont);
         sign.setSpacingBefore(20);
         document.add(sign);
+        
+        if(imagePaths != null && !imagePaths.isEmpty()) {
+        	for(String imgPath : imagePaths) {
+        		try {
+        			document.newPage();
+        			document.add(new Paragraph("첨부 이미지", titleFont));
+        			document.add(Chunk.NEWLINE);
+        			
+        			Image img = Image.getInstance(imgPath);
+                    img.scaleAbsolute(100, 100);
+                    img.setAlignment(Element.ALIGN_CENTER);
+                    document.add(img);
+        		} catch(Exception e) {
+        			 System.err.println("이미지 추가 실패: " + imgPath);
+                     e.printStackTrace();
+        		}
+        	}
+        }
+
+       
 
         document.close();
     }
