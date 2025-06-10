@@ -136,7 +136,7 @@ public class SummaryPanel extends ImagePanel {
          
             
             for(int row : selectedRows) {
-            	int modelRow = table.convertColumnIndexToModel(row);
+            	int modelRow = table.convertRowIndexToModel(row);
             	selectedTransactions.add(td.getTransactionAt(modelRow));
             }
 

@@ -1,6 +1,7 @@
 package housekeeping.chart;
 
 import org.jfree.chart.*;
+import org.jfree.chart.labels.StandardPieSectionLabelGenerator;
 import org.jfree.chart.plot.*;
 import org.jfree.chart.renderer.category.BarRenderer;
 import org.jfree.chart.renderer.category.StandardBarPainter;
@@ -33,6 +34,13 @@ public class ChartViewer extends JFrame {
     }
 
     private JPanel createPieAndBarPanel() {
+    	Map<String, Color> categoryColorMap = new HashMap<>();
+        categoryColorMap.put("식비", new Color(173, 216, 230)); // 연한 파랑
+        categoryColorMap.put("쇼핑", new Color(255, 182, 193)); // 연한 핑크
+        categoryColorMap.put("교통", new Color(255, 255, 153)); // 연한 노랑
+        categoryColorMap.put("여가", new Color(204, 255, 204)); // 연한 초록
+        categoryColorMap.put("기타", new Color(221, 160, 221)); // 연보라
+        categoryColorMap.put("공과금", new Color(255, 204, 204)); // 연한 연핑크
         JPanel panel = new JPanel(new BorderLayout());
         JPanel topPanel = new JPanel();
         JComboBox<String> monthCombo = new JComboBox<>();
@@ -59,14 +67,31 @@ public class ChartViewer extends JFrame {
             pie.getTitle().setFont(new Font("Malgun Gothic", Font.BOLD, 18));
             pie.getLegend().setItemFont(new Font("Malgun Gothic", Font.PLAIN, 13));
             piePlot.setLabelFont(new Font("Malgun Gothic", Font.PLAIN, 14));
+            piePlot.setLabelGenerator(new StandardPieSectionLabelGenerator("{0}: {1} ({2})"));
             ChartPanel pieChartPanel = new ChartPanel(pie);
             chartPanel.add(pieChartPanel);
+            piePlot.setBackgroundPaint(Color.WHITE);
 
             // Bar
             DefaultCategoryDataset barDataset = new DefaultCategoryDataset();
             categoryData.forEach((k, v) -> barDataset.addValue(v, "지출", k));
             JFreeChart bar = ChartFactory.createBarChart("카테고리별 지출 (막대)", "카테고리", "금액", barDataset);
             CategoryPlot barPlot = bar.getCategoryPlot();
+            
+            BarRenderer renderer = new BarRenderer() {
+                @Override
+                public Paint getItemPaint(int row, int column) {
+                    // 바 차트 색상 디버깅
+                    String category = (String) barDataset.getColumnKey(column);
+                    System.out.println("컬럼: " + category); // 콘솔 출력으로 확인
+                    return categoryColorMap.getOrDefault(category, Color.PINK);
+                }
+            };
+            renderer.setDrawBarOutline(false);
+            renderer.setShadowVisible(false);
+            renderer.setBarPainter(new StandardBarPainter());
+            barPlot.setRenderer(renderer);
+            
             bar.getTitle().setFont(new Font("Malgun Gothic", Font.BOLD, 18));
             bar.getLegend().setItemFont(new Font("Malgun Gothic", Font.PLAIN, 13));
             barPlot.getDomainAxis().setLabelFont(new Font("Malgun Gothic", Font.PLAIN, 14));
@@ -103,6 +128,8 @@ public class ChartViewer extends JFrame {
         barRenderer.setBarPainter(new StandardBarPainter());
         barRenderer.setDrawBarOutline(false);
         barRenderer.setShadowVisible(false);
+        plot.setBackgroundPaint(Color.WHITE);
+        plot.setRangeGridlinePaint(new Color(220, 220, 220)); // 연한 회색
 
         // 추세선 추가
         DefaultCategoryDataset lineDataset = new DefaultCategoryDataset();
@@ -141,7 +168,7 @@ public class ChartViewer extends JFrame {
         			    "SELECT COALESCE(ec.name, '기타') AS name, SUM(e.amount) " +
         			    "FROM expenses e " +
         			    "JOIN expense_categories ec ON e.category_id = ec.id " +
-        			    "WHERE e.user_id = ? AND DATE_FORMAT(e.date, '%Y-%m') = ? " +
+        			    "WHERE e.user_id = ? AND DATE_FORMAT(e.date, '%Y-%m') = ? AND ec.name != '수입' " +
         			    "GROUP BY name"
         			);) {
             ps.setInt(1, userId);
